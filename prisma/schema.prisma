@@ -11,22 +11,21 @@ datasource db {
 }
 
 model List {
-  id       Int        @id @default(autoincrement())
-  name     String
-  ListItem ListItem[]
+  id         Int         @id @default(autoincrement())
+  name       String
+  ListEntry  ListEntry[]
 }
 
 model Item {
-  id       Int        @id @default(autoincrement())
-  name     String
-  ListItem ListItem[]
+  name       String      @id @db.VarChar(255)
+  ListEntry  ListEntry[]
 }
 
-model ListItem {
-  id      Int  @id @default(autoincrement())
-  list_id List @relation(fields: [listId], references: [id])
-  listId  Int
-  item_id Item @relation(fields: [itemId], references: [id])
-  itemId  Int
-  completed Boolean
+model ListEntry {
+  id         Int         @id @default(autoincrement())
+  list       List        @relation(fields: [listId], references: [id])
+  listId     Int
+  item       Item        @relation(fields: [itemName], references: [name])
+  itemName   String
+  completed  Boolean     @default(false)
 }

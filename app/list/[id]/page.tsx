@@ -24,54 +24,47 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 
-import { List, ListItem } from "@/types/list"
+
+import { endpoints, List } from "@/app/endpoints"
+import { useRouter } from "next/navigation"
 
 export default function List({ params }: { params: { id: string } }) {
     const [data, setData] = useState<List>()
     const [item, setItem] = useState<string>("")
     const [open, setOpen] = useState(false)
+    const router = useRouter();
+
 
     useEffect(() => {
-        const getData = async () => {
-            const response = await fetch(`/api/list/${params.id}`, { method: "GET" })
-            return response.json()
-        }
-        getData().then((res) => setData(res))
+        endpoints.getList(params.id).then((res) => {
+            setData(res)
+        })
     }, [])
 
     if (!data) return <></>
 
     const onRowClick = (id: number) => {
-        const item = data.items.find(item => item.id === id);
-        if (!item) return;
-
-        fetch(`/api/list-item/${id}/${!item.completed}`, {
-            method: "POST"
-        })
-            .then(() =>
-                setData({ ...data, items: data.items.map((item: ListItem) => item.id === id ? { ...item, completed: !item.completed } : item) })
-            )
     }
 
     const onDeleteClick = (id: number) => {
-        setData({ ...data, items: data.items.filter(item => item.id !== id) });
     }
 
     const onCreateItem = () => {
-        const newItem: any = fetch(`/api/list/${params.id}/${item}`, {
-            method: "PUT"
-        }).then((res) => res.json()).then((d) => setData({ ...data, items: [...data.items, d] }));
-
-        setItem("");
-        setOpen(false)
+        endpoints.createItem(item, params.id).then((res) => {
+            setData({ ...data, ListEntry: [...data.ListEntry, res] })
+        })
     }
+
+    const onDeleteListClick = () => {
+    }
+
     return (
         <div>
             <header className="p-4 flex flex-row justify-between items-center">
                 <h1 className="text-xl font-extrabold leading-tight tracking-tighter md:text-4xl">
                     {data.name}
                 </h1>
-                <div>{data.items.reduce((acc, item) => acc + +item.completed, 0)} / {data.items.length}</div>
+                <div>{}</div>
 
                 <div className="flex flex-row gap-4">
                     <Popover>
@@ -84,7 +77,7 @@ export default function List({ params }: { params: { id: string } }) {
                             <div className="grid gap-4">This does nothing currently</div>
                         </PopoverContent>
                     </Popover>
-                    <Button variant="ghost" className="w-10 rounded-full p-0">
+                    <Button variant="ghost" className="w-10 rounded-full p-0" onClick={onDeleteListClick}>
                         <Trash2 />
                     </Button>
                 </div>
@@ -97,7 +90,7 @@ export default function List({ params }: { params: { id: string } }) {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {data.items.sort((a, b) => +a.completed - +b.completed).map((item) => (
+                    {data.ListEntry.map((item) => (
                         <TableRow
                             key={item.name}
                         >

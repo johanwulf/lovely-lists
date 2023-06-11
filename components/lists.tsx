@@ -3,23 +3,18 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 
-import { List } from "@/types/list"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
+import { ListOverview, endpoints } from "@/app/endpoints"
 
 export default function Lists() {
-    const [lists, setLists] = useState([])
+    const [lists, setLists] = useState<ListOverview[]>([])
     const [loading, setLoading] = useState(true)
     const router = useRouter()
 
     useEffect(() => {
-        const getLists = async () => {
-            const response = await fetch("/api/list", { method: "GET" })
-
-            return response.json()
-        }
-        getLists().then((res) => {
-            setLists(res.data)
+        endpoints.getAllLists().then((res) => {
+            setLists(res)
             setLoading(false)
         })
     }, [])
@@ -34,7 +29,7 @@ export default function Lists() {
 
     return (
         <>
-            {lists.map((list: List) => {
+            {lists.map((list: ListOverview) => {
                 return (
                     <Card key={list.id} onClick={() => router.push(`list/${list.id}`)}>
                         <CardHeader>

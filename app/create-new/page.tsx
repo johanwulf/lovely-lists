@@ -6,16 +6,16 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
+import { endpoints } from "../endpoints"
+
 export default function CreateNew() {
     const [listName, setListName] = useState("")
     const router = useRouter()
 
     const onCreateClick = () => {
-        fetch(`/api/list/${listName}/`, {
-            method: "POST",
-        })
-            .then((res) => res.json())
-            .then((data) => router.push(`list/${data.list.id}`))
+        endpoints
+            .createList(listName)
+            .then((data) => router.push(`list/${data.id}`))
     }
 
     return (
