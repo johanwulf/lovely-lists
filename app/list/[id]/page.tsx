@@ -29,7 +29,7 @@ import { endpoints, List } from "@/app/endpoints"
 import { useRouter } from "next/navigation"
 
 export default function List({ params }: { params: { id: string } }) {
-    const [data, setData] = useState<List>()
+    const [data, setData] = useState<List | null>(null)
     const [item, setItem] = useState<string>("")
     const [open, setOpen] = useState(false)
     const router = useRouter();
@@ -49,10 +49,21 @@ export default function List({ params }: { params: { id: string } }) {
     const onDeleteClick = (id: number) => {
     }
 
-    const onCreateItem = () => {
-        endpoints.createItem(item, params.id).then((res) => {
-            setData({ ...data, items: [...data.items, res] })
+    const onCreateItem = async (event: any) => {
+        event.preventDefault();
+        const newItem = await endpoints.createItem(item, params.id).then((res) => {
+            return res;
         })
+        console.log(newItem)
+        setItem("");
+        setOpen(false);
+        // Use JSON.parse(JSON.stringify(data.items)) to create a deep copy of the items array
+        const newItems = JSON.parse(JSON.stringify(data.items));
+        // Push the newItem to the newItems array
+        newItems.push(newItem);
+        // Update the data object with the newItems array
+        setData({ ...data, items: newItems })
+        console.log(data.items)
     }
 
     const onDeleteListClick = () => {
@@ -92,7 +103,7 @@ export default function List({ params }: { params: { id: string } }) {
                 <TableBody>
                     {data.items.map((item) => (
                         <TableRow
-                            key={item.name}
+                            key={item.id}
                         >
                             <TableCell className={`font-medium w-max ${item.completed ? "line-through" : ""}`} onClick={() => onRowClick(item.id)}>{item.name}</TableCell>
                             <TableCell className="font-medium text-right w-1">
@@ -125,7 +136,7 @@ export default function List({ params }: { params: { id: string } }) {
                             onChange={(e) => setItem(e.target.value)}
                         />
                         <DialogFooter className="mt-4">
-                            <Button type="submit" disabled={item.length < 1} onClick={onCreateItem}>Save changes</Button>
+                            <Button type="submit" disabled={item.length < 1}>Save changes</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>

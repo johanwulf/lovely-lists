@@ -15,7 +15,7 @@ export async function POST(req: NextRequest, { params }: Params) {
         create: { name: name as string },
     })
 
-    const response = await prisma.listEntry.create({
+    const listEntry = await prisma.listEntry.create({
         data: {
             list: {
                 connect: { id: id as number },
@@ -25,6 +25,13 @@ export async function POST(req: NextRequest, { params }: Params) {
             },
         },
     })
+
+    const response = {
+        id: listEntry.id,
+        name: listEntry.itemName,
+        listId: listEntry.listId,
+        completed: listEntry.completed,
+    }
 
     return NextResponse.json(response)
 }
