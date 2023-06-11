@@ -51,7 +51,7 @@ export default function List({ params }: { params: { id: string } }) {
 
     const onCreateItem = () => {
         endpoints.createItem(item, params.id).then((res) => {
-            setData({ ...data, ListEntry: [...data.ListEntry, res] })
+            setData({ ...data, items: [...data.items, res] })
         })
     }
 
@@ -90,7 +90,7 @@ export default function List({ params }: { params: { id: string } }) {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {data.ListEntry.map((item) => (
+                    {data.items.map((item) => (
                         <TableRow
                             key={item.name}
                         >

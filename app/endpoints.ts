@@ -30,7 +30,7 @@ export type List = {
     totalItems: number
     completedItems: number
     uncompletedItems: number
-    ListEntry: ListEntry[]
+    items: ListEntry[]
 }
 
 async function api<T>(

@@ -9,8 +9,7 @@ const prisma = new PrismaClient()
 export async function GET(req: NextRequest, { params }: Params) {
     const { id } = parseParams(params)
 
-    // assume the original object is stored in a variable called data
-    const data = await prisma.list.findUnique({
+    const list = await prisma.list.findUnique({
         where: { id: id as number },
         select: {
             id: true,
@@ -24,23 +23,19 @@ export async function GET(req: NextRequest, { params }: Params) {
             },
         },
     })
-    if (!data) return
-    // use map to transform the ListEntry array into the items array
-    const items = data.ListEntry.map((entry) => {
-        // rename the itemName field to name
-        return {
-            ...entry,
-            name: entry.itemName,
-        }
-    })
 
-    // use spread operator to create a new object with the items field
+    if (!list) return
+
     const result = {
-        ...data,
-        items: items,
+        id: list.id,
+        name: list.name,
+        items: list.ListEntry.map((item) => ({
+            id: item.id,
+            completed: item.completed,
+            name: item.itemName,
+        })),
     }
 
-    // return the result as JSON
     return NextResponse.json(result)
 }
 
