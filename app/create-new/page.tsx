@@ -12,7 +12,8 @@ export default function CreateNew() {
     const [listName, setListName] = useState("")
     const router = useRouter()
 
-    const onCreateClick = () => {
+    const onCreateClick = (event: any) => {
+        event.preventDefault()
         endpoints
             .createList(listName)
             .then((data) => router.push(`list/${data.id}`))
@@ -24,18 +25,24 @@ export default function CreateNew() {
                 <h1 className="text-3xl font-extrabold leading-tight tracking-tighter md:text-4xl">
                     Create new list
                 </h1>
-                <Input
-                    type="text"
-                    placeholder="List name"
-                    onChange={(e) => setListName(e.target.value)}
-                />
-                <Button
-                    className="w-full"
-                    disabled={listName.length === 0}
-                    onClick={onCreateClick}
+                <form
+                    onSubmit={onCreateClick}
+                    className="flex w-full flex-col items-start gap-2"
                 >
-                    Create
-                </Button>
+                    <Input
+                        type="text"
+                        placeholder="List name"
+                        onChange={(e) => setListName(e.target.value)}
+                        autoFocus
+                    />
+                    <Button
+                        className="w-full"
+                        disabled={listName.length === 0}
+                        type="submit"
+                    >
+                        Create
+                    </Button>
+                </form>
             </div>
         </section>
     )

@@ -1,10 +1,3 @@
-import { NextRequest } from "next/server"
-
-type ListData = {
-    id: number
-}
-
-// define the type of data you expect from the API
 type ListResponse = {
     id: number
     name: string
@@ -20,16 +13,13 @@ export type ListOverview = {
 export type ListEntry = {
     id: number
     name: string
-    listId: number
+    listId?: number
     completed: boolean
 }
 
 export type List = {
     name: string
     id: number
-    totalItems: number
-    completedItems: number
-    uncompletedItems: number
     items: ListEntry[]
 }
 
@@ -45,16 +35,22 @@ async function api<T>(
 }
 
 export const endpoints = {
-    getList: async (listId: string): Promise<List> => {
+    getList: async (listId: number): Promise<List> => {
         return api<List>(`/api/lists/${listId}`, "GET")
     },
     createList: async (listName: string): Promise<ListResponse> => {
         return api<ListResponse>(`/api/lists/${listName}`, "POST")
     },
+    deleteList: async (listId: number): Promise<ListResponse> => {
+        return api<ListResponse>(`/api/lists/${listId}`, "DELETE")
+    },
     getAllLists: async (): Promise<ListOverview[]> => {
         return api<ListOverview[]>(`/api/lists`, "GET")
     },
-    createItem: async (itemName: string, listId: string): Promise<ListEntry> => {
-        return api<ListEntry>(`/api/item/${itemName}/${listId}`, "POST")
+    createItem: async (listId: number, itemName: string): Promise<ListEntry> => {
+        return api<ListEntry>(`/api/item/${listId}/${itemName}`, "POST")
+    },
+    deleteItem: async (itemId: number): Promise<ListEntry> => {
+        return api<ListEntry>(`/api/item/${itemId}`, "DELETE")
     },
 }

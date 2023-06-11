@@ -28,7 +28,7 @@ import {
 import { endpoints, List } from "@/app/endpoints"
 import { useRouter } from "next/navigation"
 
-export default function List({ params }: { params: { id: string } }) {
+export default function List({ params }: { params: { id: number } }) {
     const [data, setData] = useState<List | null>(null)
     const [item, setItem] = useState<string>("")
     const [open, setOpen] = useState(false)
@@ -46,27 +46,25 @@ export default function List({ params }: { params: { id: string } }) {
     const onRowClick = (id: number) => {
     }
 
-    const onDeleteClick = (id: number) => {
+    const onDeleteItem = async (id: number) => {
+        await endpoints.deleteItem(id).then(() => {
+            setData({ ...data, items: [...data.items].filter((e) => e.id !== id) })
+        })
     }
 
     const onCreateItem = async (event: any) => {
         event.preventDefault();
-        const newItem = await endpoints.createItem(item, params.id).then((res) => {
-            return res;
+        await endpoints.createItem(params.id, item).then((res) => {
+            setData({ ...data, items: [...data.items, res] })
         })
-        console.log(newItem)
         setItem("");
         setOpen(false);
-        // Use JSON.parse(JSON.stringify(data.items)) to create a deep copy of the items array
-        const newItems = JSON.parse(JSON.stringify(data.items));
-        // Push the newItem to the newItems array
-        newItems.push(newItem);
-        // Update the data object with the newItems array
-        setData({ ...data, items: newItems })
-        console.log(data.items)
     }
 
-    const onDeleteListClick = () => {
+    const onDeleteList = async () => {
+        await endpoints.deleteList(params.id).then(() => {
+            router.push(`/`)
+        })
     }
 
     return (
@@ -88,7 +86,7 @@ export default function List({ params }: { params: { id: string } }) {
                             <div className="grid gap-4">This does nothing currently</div>
                         </PopoverContent>
                     </Popover>
-                    <Button variant="ghost" className="w-10 rounded-full p-0" onClick={onDeleteListClick}>
+                    <Button variant="ghost" className="w-10 rounded-full p-0" onClick={onDeleteList}>
                         <Trash2 />
                     </Button>
                 </div>
@@ -107,7 +105,7 @@ export default function List({ params }: { params: { id: string } }) {
                         >
                             <TableCell className={`font-medium w-max ${item.completed ? "line-through" : ""}`} onClick={() => onRowClick(item.id)}>{item.name}</TableCell>
                             <TableCell className="font-medium text-right w-1">
-                                <Button variant="ghost" className="rounded-full p-0 z-50" onClick={() => onDeleteClick(item.id)}>
+                                <Button variant="ghost" className="rounded-full p-0 z-50" onClick={() => onDeleteItem(item.id)}>
                                     <Trash2 />
                                 </Button>
                             </TableCell>

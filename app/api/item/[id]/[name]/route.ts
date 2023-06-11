@@ -3,11 +3,12 @@ import { PrismaClient } from "@prisma/client"
 
 import { Params } from "@/types/params"
 import { parseParams } from "@/lib/utils"
+import { ListEntry } from "@/app/endpoints"
 
 const prisma = new PrismaClient()
 
 export async function POST(req: NextRequest, { params }: Params) {
-    const { name, id } = parseParams(params)
+    const { id, name } = parseParams(params)
 
     const item = await prisma.item.upsert({
         where: { name: name as string },
@@ -26,7 +27,7 @@ export async function POST(req: NextRequest, { params }: Params) {
         },
     })
 
-    const response = {
+    const response: ListEntry = {
         id: listEntry.id,
         name: listEntry.itemName,
         listId: listEntry.listId,
