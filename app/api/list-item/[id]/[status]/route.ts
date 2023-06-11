@@ -10,8 +10,8 @@ export async function POST(
     const itemId = parseInt(params.id, 10)
     const completed = params.status === "true"
 
-    const updatedListItems = await prisma.listItem.updateMany({
-        where: { itemId: itemId },
+    const updatedListItems = await prisma.listItem.update({
+        where: { id: itemId },
         data: { completed: completed },
     })
 

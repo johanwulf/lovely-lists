@@ -54,7 +54,6 @@ export default function List({ params }: { params: { id: string } }) {
     }
 
     const onDeleteClick = (id: number) => {
-        console.log("delete click")
         setData({ ...data, items: data.items.filter(item => item.id !== id) });
     }
 
@@ -66,7 +65,6 @@ export default function List({ params }: { params: { id: string } }) {
         setItem("");
         setOpen(false)
     }
-
     return (
         <div>
             <header className="p-4 flex flex-row justify-between items-center">
