@@ -208,31 +208,6 @@ export default function List({ params }: { params: { id: number } }) {
                                                 </form>
                                             </DialogContent>
                                         </Dialog>
-
-                                        <Popover>
-                                            <PopoverTrigger asChild>
-                                                <Button variant="ghost" className="w-10 rounded-full p-0" onClick={() => setDescription(item.description || "")}>
-                                                    <Pencil />
-                                                </Button>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-50 mt-2 mr-2 p-4 bg-background border radius-5 rounded">
-                                                <div className="grid gap-4 mb-2">Edit item</div>
-                                                <Input
-                                                    type="text"
-                                                    placeholder={item.name}
-                                                    onChange={(e) => setName(e.target.value)}
-                                                />
-                                                <Input
-                                                    className="mt-4"
-                                                    type="text"
-                                                    placeholder={item.description ? item.description : ''}
-                                                    onChange={(e) => setDescription(e.target.value)}
-                                                />
-                                                <DialogFooter className="mt-4">
-                                                    <Button type="submit" disabled={name.length < 1} onClick={() => onEditItem(item.id)}>Save changes</Button>
-                                                </DialogFooter>
-                                            </PopoverContent>
-                                        </Popover>
                                         <Button variant="ghost" className="w-10 h-10 rounded-full p-0 z-50" onClick={() => onDeleteItem(item.id)}>
                                             <Trash2 />
                                         </Button>
