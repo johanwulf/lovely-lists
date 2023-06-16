@@ -153,7 +153,7 @@ export default function List({ params }: { params: { id: number } }) {
                         items={data.items.map((item) => item.id)}
                         strategy={verticalListSortingStrategy}
                     >
-                        {data.items.map((item) => (
+                        {data.items.sort((a, b) => a.completed === b.completed ? 0 : a.completed ? 1 : -1).map((item) => (
                             <SortableItem id={item.id} key={item.id}>
                                 <div className="flex flex-row hover:bg-muted/50 justify-between border-b p-4 cursor-pointer items-center" onClick={() => onRowClick(item.id)}>
                                     <div className="flex flex-col">
