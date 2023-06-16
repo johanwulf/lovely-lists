@@ -34,7 +34,9 @@ export default function List({ params }: { params: { id: number } }) {
     const [data, setData] = useState<List | null>(null)
     const [name, setName] = useState<string>("")
     const [description, setDescription] = useState<string>("")
-    const [open, setOpen] = useState(false)
+    const [createOpen, setCreateOpen] = useState(false)
+    const [editOpen, setEditOpen] = useState(false)
+
     const router = useRouter();
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -73,7 +75,8 @@ export default function List({ params }: { params: { id: number } }) {
         })
     }
 
-    const onEditItem = async (id: number) => {
+    const onEditItem = async (event: any, id: number) => {
+        event.preventDefault();
         const item = data.items.find((item) => item.id === id);
 
         if (!item) return;
@@ -82,6 +85,7 @@ export default function List({ params }: { params: { id: number } }) {
         setDescription("")
         setData({ ...data, items: [...data.items.filter((item) => item.id !== id), updatedItem] })
         await endpoints.updateItem(updatedItem)
+        setEditOpen(false)
     }
 
     const onCreateItem = async (event: any) => {
@@ -91,7 +95,7 @@ export default function List({ params }: { params: { id: number } }) {
         })
         setName("");
         setDescription("");
-        setOpen(false);
+        setCreateOpen(false);
     }
 
     const onDeleteList = async () => {
@@ -169,6 +173,42 @@ export default function List({ params }: { params: { id: number } }) {
                                         <p className="text-sm">{item.description}</p>
                                     </div>
                                     <div className="p-4">
+                                        <Dialog open={editOpen} onOpenChange={setEditOpen}>
+                                            <DialogTrigger asChild>
+                                                <Button
+                                                    variant="ghost"
+                                                    className="w-10 rounded-full p-0" onClick={() => {
+                                                        setDescription(item.description || "")
+                                                        setName(item.name)
+                                                    }}
+                                                >
+                                                    <Pencil />
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DialogContent className="rounded top-1/3 w-[80%]">
+                                                <DialogHeader>
+                                                    <DialogTitle>Edit item</DialogTitle>
+                                                </DialogHeader>
+                                                <form onSubmit={(e) => onEditItem(e, item.id)}>
+                                                    <Input
+                                                        type="text"
+                                                        placeholder={item.name}
+                                                        onChange={(e) => setName(e.target.value)}
+                                                        className="text-base"
+                                                    />
+                                                    <Input
+                                                        className="mt-4 text-base"
+                                                        type="text"
+                                                        placeholder={item.description || ""}
+                                                        onChange={(e) => setDescription(e.target.value)}
+                                                    />
+                                                    <DialogFooter className="mt-4">
+                                                        <Button type="submit" disabled={name.length < 1 || (name === item.name && description === item.description)}>Save changes</Button>
+                                                    </DialogFooter>
+                                                </form>
+                                            </DialogContent>
+                                        </Dialog>
+
                                         <Popover>
                                             <PopoverTrigger asChild>
                                                 <Button variant="ghost" className="w-10 rounded-full p-0" onClick={() => setDescription(item.description || "")}>
@@ -204,7 +244,7 @@ export default function List({ params }: { params: { id: number } }) {
                 </DndContext>
             </div>
 
-            <Dialog open={open} onOpenChange={setOpen}>
+            <Dialog open={createOpen} onOpenChange={setCreateOpen}>
                 <DialogTrigger asChild>
                     <Button
                         variant="ghost"
@@ -222,9 +262,10 @@ export default function List({ params }: { params: { id: number } }) {
                             type="text"
                             placeholder="Item name"
                             onChange={(e) => setName(e.target.value)}
+                            className="text-base"
                         />
                         <Input
-                            className="mt-4"
+                            className="mt-4 text-base"
                             type="text"
                             placeholder="Description (optional)"
                             onChange={(e) => setDescription(e.target.value)}
