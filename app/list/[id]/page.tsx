@@ -32,7 +32,7 @@ import SortableItem from "@/components/sortable-item"
 
 export default function List({ params }: { params: { id: number } }) {
     const [data, setData] = useState<List | null>(null)
-    const [item, setItem] = useState<string>("")
+    const [name, setName] = useState<string>("")
     const [description, setDescription] = useState<string>("")
     const [open, setOpen] = useState(false)
     const router = useRouter();
@@ -74,14 +74,22 @@ export default function List({ params }: { params: { id: number } }) {
     }
 
     const onEditItem = async (id: number) => {
+        const item = data.items.find((item) => item.id === id);
+
+        if (!item) return;
+        const updatedItem = { ...item, name: name, description: description }
+        setName("")
+        setDescription("")
+        setData({ ...data, items: [...data.items.filter((item) => item.id !== id), updatedItem] })
+        await endpoints.updateItem(updatedItem)
     }
 
     const onCreateItem = async (event: any) => {
         event.preventDefault();
-        await endpoints.createItem(params.id, { name: item, completed: false, listId: params.id, description: description }).then((res) => {
+        await endpoints.createItem(params.id, { name: name, completed: false, listId: params.id, description: description }).then((res) => {
             setData({ ...data, items: [...data.items, res] })
         })
-        setItem("");
+        setName("");
         setDescription("");
         setOpen(false);
     }
@@ -155,15 +163,36 @@ export default function List({ params }: { params: { id: number } }) {
                     >
                         {data.items.sort((a, b) => a.completed === b.completed ? 0 : a.completed ? 1 : -1).map((item) => (
                             <SortableItem id={item.id} key={item.id}>
-                                <div className="flex flex-row hover:bg-muted/50 justify-between border-b p-4 cursor-pointer items-center" onClick={() => onRowClick(item.id)}>
-                                    <div className="flex flex-col">
+                                <div className="flex flex-row hover:bg-muted/50 justify-between border-b cursor-pointer items-center" >
+                                    <div className="flex flex-col flex-grow p-4 " onClick={() => onRowClick(item.id)}>
                                         <p className={`font-bold text-sm ${item.completed ? "line-through" : ""}`}>{item.name}</p>
                                         <p className="text-sm">{item.description}</p>
                                     </div>
-                                    <div>
-                                        <Button variant="ghost" className="w-10 h-10 rounded-full p-0 z-50" onClick={() => onEditItem(item.id)}>
-                                            <Pencil />
-                                        </Button>
+                                    <div className="p-4">
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <Button variant="ghost" className="w-10 rounded-full p-0" onClick={() => setDescription(item.description || "")}>
+                                                    <Pencil />
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-50 mt-2 mr-2 p-4 bg-background border radius-5 rounded">
+                                                <div className="grid gap-4 mb-2">Edit item</div>
+                                                <Input
+                                                    type="text"
+                                                    placeholder={item.name}
+                                                    onChange={(e) => setName(e.target.value)}
+                                                />
+                                                <Input
+                                                    className="mt-4"
+                                                    type="text"
+                                                    placeholder={item.description ? item.description : ''}
+                                                    onChange={(e) => setDescription(e.target.value)}
+                                                />
+                                                <DialogFooter className="mt-4">
+                                                    <Button type="submit" disabled={name.length < 1} onClick={() => onEditItem(item.id)}>Save changes</Button>
+                                                </DialogFooter>
+                                            </PopoverContent>
+                                        </Popover>
                                         <Button variant="ghost" className="w-10 h-10 rounded-full p-0 z-50" onClick={() => onDeleteItem(item.id)}>
                                             <Trash2 />
                                         </Button>
@@ -192,7 +221,7 @@ export default function List({ params }: { params: { id: number } }) {
                         <Input
                             type="text"
                             placeholder="Item name"
-                            onChange={(e) => setItem(e.target.value)}
+                            onChange={(e) => setName(e.target.value)}
                         />
                         <Input
                             className="mt-4"
@@ -201,7 +230,7 @@ export default function List({ params }: { params: { id: number } }) {
                             onChange={(e) => setDescription(e.target.value)}
                         />
                         <DialogFooter className="mt-4">
-                            <Button type="submit" disabled={item.length < 1}>Save changes</Button>
+                            <Button type="submit" disabled={name.length < 1}>Save changes</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>

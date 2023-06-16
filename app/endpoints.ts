@@ -57,6 +57,9 @@ export const endpoints = {
     deleteItem: async (itemId: number): Promise<ListEntry> => {
         return api<ListEntry>(`/api/item/${itemId}`, "DELETE");
     },
+    updateItem: async (item: ListEntry): Promise<ListEntry> => {
+        return api<ListEntry>(`/api/item`, "PUT", item);
+    },
     completeItem: async (itemId: number, item: ListEntry): Promise<ListEntry> => {
         return api<ListEntry>(`/api/item/${itemId}`, "PUT", item);
     },
