@@ -1,17 +1,49 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core"
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
+import SortableItem from "@/components/sortable-item"
 import { ListOverview, endpoints } from "@/app/endpoints"
 
 export default function Lists() {
   const [loading, setLoading] = useState(true)
-  const [list, setList] = useState<ListOverview[]>([]) // added here
+  const [list, setList] = useState<ListOverview[]>([])
   const router = useRouter()
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
 
+  function handleDragEnd(event: any) {
+    const { active, over } = event
+
+    if (active.id !== over.id) {
+      setList((list) => {
+        const oldIndex = list.findIndex((item) => item.id === active.id)
+        const newIndex = list.findIndex((item) => item.id === over.id)
+        return arrayMove(list, oldIndex, newIndex)
+      })
+    }
+  }
   useEffect(() => {
     endpoints.getAllLists().then((res) => {
       setList(res) // changed here
@@ -27,72 +59,41 @@ export default function Lists() {
       </h1>
     )
 
-  // Get the index of an item by its id
-  const getIndex = (id: number) => list.findIndex((item) => item.id === id)
-
-  const moveItem = (from: number, to: number) => {
-    setList((prevList) => {
-      const newList = [...prevList]
-      const [removed] = newList.splice(from, 1)
-      newList.splice(to, 0, removed)
-      return newList
-    })
-  }
-
-  const handleDragStart = (e: React.DragEvent, id: number) => {
-    e.dataTransfer.setData("id", id.toString())
-  }
-
-  const handleDragOver = (e: React.DragEvent, id: number) => {
-    e.preventDefault()
-    const draggedId = e.dataTransfer.getData("id")
-    if (draggedId !== id.toString()) {
-      const draggedIndex = getIndex(Number(draggedId))
-      const droppedIndex = getIndex(id)
-      moveItem(draggedIndex, droppedIndex)
-    }
-  }
-
-  const handleDrop = (e: React.DragEvent, id: number) => {
-    e.preventDefault()
-    const draggedId = e.dataTransfer.getData("id")
-    if (draggedId) {
-      const draggedIndex = getIndex(Number(draggedId))
-      const droppedIndex = getIndex(id)
-      if (draggedIndex !== droppedIndex) {
-        moveItem(draggedIndex, droppedIndex)
-      }
-    }
-  }
-
   return (
-    <>
-      {list.map((list: ListOverview) => {
-        return (
-          <Card
-            key={list.id}
-            onDragStart={(e) => handleDragStart(e, list.id)}
-            onDragOver={(e) => handleDragOver(e, list.id)}
-            onDrop={(e) => handleDrop(e, list.id)}
-            onClick={() => router.push(`list/${list.id}`)}
-            draggable
-          >
-            <CardHeader>
-              <CardTitle>{list.name}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col">
-                <Progress
-                  value={(list.completedItems / list.totalItems) * 100}
-                />
-                <div className="flex flex-row mt-2">
-                  {list.completedItems} / {list.totalItems}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )
-      })}
-    </>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext
+        items={list.map((item) => item.id)}
+        strategy={verticalListSortingStrategy}
+      >
+        {list.map((list: ListOverview) => {
+          return (
+            <SortableItem key={list.id} id={list.id}>
+              <Card
+                key={list.id}
+                onClick={() => router.push(`list/${list.id}`)}
+              >
+                <CardHeader>
+                  <CardTitle>{list.name}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col">
+                    <Progress
+                      value={(list.completedItems / list.totalItems) * 100}
+                    />
+                    <div className="flex flex-row mt-2">
+                      {list.completedItems} / {list.totalItems}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </SortableItem>
+          )
+        })}
+      </SortableContext>
+    </DndContext>
   )
 }
