@@ -39,15 +39,22 @@ export default function Lists() {
     })
   )
 
-  function handleDragEnd(event: DragEndEvent) {
+  async function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
 
     if (over && active.id !== over.id) {
+      const firstList = list.find((item) => item.id === over.id)
+      const secondList = list.find((item) => item.id === active.id)
+
+      if (!firstList || !secondList) return
+
       setList((list) => {
         const oldIndex = list.findIndex((item) => item.id === active.id)
         const newIndex = list.findIndex((item) => item.id === over.id)
         return arrayMove(list, oldIndex, newIndex)
       })
+
+      await endpoints.reorderLists(firstList, secondList)
     }
   }
   useEffect(() => {

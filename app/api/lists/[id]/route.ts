@@ -50,8 +50,17 @@ export async function GET(req: NextRequest, { params }: Params) {
  */
 export async function POST(req: NextRequest, { params }: Params) {
   const { id } = parseParams(params)
+  const currentMax = await prisma.list.aggregate({
+    _max: {
+      order: true,
+    },
+  })
 
-  const result = await prisma.list.create({ data: { name: id as string } })
+  const order = currentMax._max.order ? currentMax._max.order + 1 : 1
+
+  const result = await prisma.list.create({
+    data: { name: id as string, order: order },
+  })
   return NextResponse.json(result)
 }
 

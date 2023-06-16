@@ -5,6 +5,7 @@ type ListResponse = {
 export type ListOverview = {
   name: string
   id: number
+  order: number
   totalItems: number
   completedItems: number
   uncompletedItems: number
@@ -51,10 +52,10 @@ export const endpoints = {
     return api<ListOverview[]>(`/api/lists`, "GET")
   },
   reorderLists: async (
-    firstList: number,
-    secondList: number
+    firstList: ListOverview,
+    secondList: ListOverview
   ): Promise<ListOverview[]> => {
-    return api<ListOverview[]>(`/api/lists/${firstList}/${secondList}`, "POST")
+    return api<ListOverview[]>(`/api/lists/`, "POST", [firstList, secondList])
   },
   createItem: async (
     listId: number,
