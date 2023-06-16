@@ -44,10 +44,12 @@ export default function List({ params }: { params: { id: number } }) {
     if (!data) return <></>
 
     const onRowClick = async (id: number) => {
-      const currentStatus = data.items.filter((item) => item.id === id)[0].completed;
-      await endpoints.completeItem(id, !currentStatus).then(() => {
-        setData({ ...data, items: data.items.map((item) => item.id === id ? { ...item, completed: !item.completed } : item) })
-      })
+      const item = data.items.find((item) => item.id === id)
+      if (!item) return;
+      const updatedItem = {...item, completed: !item.completed}
+      setData({ ...data, items: data.items.map((item) => item.id === id ? updatedItem : item) })
+
+      await endpoints.completeItem(id, updatedItem)
     }
 
     const onDeleteItem = async (id: number) => {
@@ -61,10 +63,11 @@ export default function List({ params }: { params: { id: number } }) {
 
     const onCreateItem = async (event: any) => {
         event.preventDefault();
-        await endpoints.createItem(params.id, {name: item, completed: false, listId: params.id }).then((res) => {
+        await endpoints.createItem(params.id, {name: item, completed: false, listId: params.id, description: description}).then((res) => {
             setData({ ...data, items: [...data.items, res] })
         })
         setItem("");
+        setDescription("");
         setOpen(false);
     }
 
@@ -81,7 +84,7 @@ export default function List({ params }: { params: { id: number } }) {
                     {data.name}
                 </h1>
 
-                <div className="flex flex-row gap-4">
+                <div className="flex flex-row">
                     <Popover>
                         <PopoverTrigger asChild>
                             <Button variant="ghost" className="w-10 rounded-full p-0">
@@ -109,7 +112,12 @@ export default function List({ params }: { params: { id: number } }) {
                         <TableRow
                             key={item.id}
                         >
-                            <TableCell className={`font-medium w-max ${item.completed ? "line-through" : ""}`} onClick={() => onRowClick(item.id)}>{item.name}</TableCell>
+                            <TableCell className={`font-medium w-max ${item.completed ? "line-through" : ""}`} onClick={() => onRowClick(item.id)}>
+                              <div className="flex flex-col">
+                                <p className="font-bold">{item.name}</p>
+                                <p>{item.description && item.description}</p>
+                              </div>
+                            </TableCell>
                             <TableCell className="font-medium text-right w-1">
                                 <Button variant="ghost" className="w-10 h-10 rounded-full p-0 z-50" onClick={() => onEditItem(item.id)}>
                                     <Pencil />

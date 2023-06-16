@@ -7,23 +7,27 @@ import { parseParams } from "@/lib/utils"
 const prisma = new PrismaClient()
 
 export async function GET() {
-    const lists = await prisma.list.findMany({
-        select: {
-            id: true,
-            name: true,
-            ListEntry: { select: { completed: true } },
-        },
-    })
+  const lists = await prisma.list.findMany({
+    select: {
+      id: true,
+      name: true,
+      order: true,
+      ListEntry: { select: { completed: true } },
+    },
+    orderBy: {
+      order: "asc",
+    },
+  })
 
-    const result = lists.map((list) => ({
-        id: list.id,
-        name: list.name,
-        totalItems: list.ListEntry.length,
-        completedItems: list.ListEntry.filter((listItem) => listItem.completed)
-            .length,
-        uncompletedItems: list.ListEntry.filter((listItem) => !listItem.completed)
-            .length,
-    }))
+  const result = lists.map((list) => ({
+    id: list.id,
+    name: list.name,
+    totalItems: list.ListEntry.length,
+    completedItems: list.ListEntry.filter((listItem) => listItem.completed)
+      .length,
+    uncompletedItems: list.ListEntry.filter((listItem) => !listItem.completed)
+      .length,
+  }))
 
-    return NextResponse.json(result)
+  return NextResponse.json(result)
 }

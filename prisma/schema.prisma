@@ -14,6 +14,7 @@ model List {
   id         Int         @id @default(autoincrement())
   name       String
   ListEntry  ListEntry[]
+  order      Int
 }
 
 model Item {
@@ -28,4 +29,5 @@ model ListEntry {
   item       Item        @relation(fields: [itemName], references: [name])
   itemName   String
   completed  Boolean     @default(false)
+  description String?    @db.VarChar(255) @default("")
 }

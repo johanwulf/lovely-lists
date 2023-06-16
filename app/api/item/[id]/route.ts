@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 import { PrismaClient } from "@prisma/client"
 
-import { Params } from "@/types/params"
-import { parseParams } from "@/lib/utils"
 import { ListEntry } from "@/app/endpoints"
 
 const prisma = new PrismaClient()
 
+/**
+ * Create new listitem entry and attach it to list
+ */
 export async function POST(
   req: NextRequest,
   { params }: { params: { id: string } }
@@ -22,6 +23,7 @@ export async function POST(
 
   const listEntry = await prisma.listEntry.create({
     data: {
+      description: item.description,
       list: {
         connect: { id: listId },
       },
@@ -36,11 +38,15 @@ export async function POST(
     name: listEntry.itemName,
     listId: listEntry.listId,
     completed: listEntry.completed,
+    description: item.description,
   }
 
   return NextResponse.json(response)
 }
 
+/**
+ * Delete item from list
+ */
 export async function DELETE(
   req: NextRequest,
   { params }: { params: { id: string } }
@@ -52,12 +58,19 @@ export async function DELETE(
   return NextResponse.json(item)
 }
 
-export async function PUT(req: NextRequest, { params }: Params) {
-  const { id, name } = parseParams(params)
+/**
+ * Update status of item
+ */
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const itemId = Number(params.id)
+  const item: ListEntry = await req.json()
 
-  const item = await prisma.listEntry.update({
-    where: { id: id as number },
-    data: { completed: name as boolean },
+  const res = await prisma.listEntry.update({
+    where: { id: itemId },
+    data: { completed: item.completed },
   })
 
   return NextResponse.json(item)

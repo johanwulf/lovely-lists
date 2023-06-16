@@ -14,6 +14,7 @@ export type ListEntry = {
   id: number
   name: string
   listId?: number
+  description?: string | null
   completed: boolean
 }
 
@@ -49,6 +50,12 @@ export const endpoints = {
   getAllLists: async (): Promise<ListOverview[]> => {
     return api<ListOverview[]>(`/api/lists`, "GET")
   },
+  reorderLists: async (
+    firstList: number,
+    secondList: number
+  ): Promise<ListOverview[]> => {
+    return api<ListOverview[]>(`/api/lists/${firstList}/${secondList}`, "POST")
+  },
   createItem: async (
     listId: number,
     item: Partial<ListEntry>
@@ -58,7 +65,7 @@ export const endpoints = {
   deleteItem: async (itemId: number): Promise<ListEntry> => {
     return api<ListEntry>(`/api/item/${itemId}`, "DELETE")
   },
-  completeItem: async (itemId: number, status: boolean): Promise<ListEntry> => {
-    return api<ListEntry>(`/api/item/${itemId}/${status}`, "PUT")
+  completeItem: async (itemId: number, item: ListEntry): Promise<ListEntry> => {
+    return api<ListEntry>(`/api/item/${itemId}`, "PUT", item)
   },
 }
