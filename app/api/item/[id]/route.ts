@@ -15,6 +15,17 @@ export async function POST(
   const listId = Number(params.id)
   const item: ListEntry = await req.json()
 
+  const currentMax = await prisma.listEntry.aggregate({
+    _max: {
+      order: true,
+    },
+    where: {
+      listId: listId,
+    },
+  })
+
+  const order = currentMax._max.order ? currentMax._max.order + 1 : 1
+
   await prisma.item.upsert({
     where: { name: item.name },
     update: {},
@@ -30,6 +41,7 @@ export async function POST(
       item: {
         connect: { name: item.name },
       },
+      order: order,
     },
   })
 
@@ -39,6 +51,7 @@ export async function POST(
     listId: listEntry.listId,
     completed: listEntry.completed,
     description: item.description,
+    order: order,
   }
 
   return NextResponse.json(response)

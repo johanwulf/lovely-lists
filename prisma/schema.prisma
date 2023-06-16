@@ -30,4 +30,5 @@ model ListEntry {
   itemName   String
   completed  Boolean     @default(false)
   description String?    @db.VarChar(255) @default("")
+  order      Int
 }

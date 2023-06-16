@@ -17,6 +17,7 @@ export type ListEntry = {
   listId?: number
   description?: string | null
   completed: boolean
+  order: number
 }
 
 export type List = {
