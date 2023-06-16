@@ -6,7 +6,7 @@ const SortableItem = (props: any) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: props.id })
 
-  const { children } = props
+  const { children, onClick } = props
 
   const itemStyle = {
     transform: CSS.Transform.toString(transform),
@@ -15,7 +15,13 @@ const SortableItem = (props: any) => {
   }
 
   return (
-    <div ref={setNodeRef} style={itemStyle} {...attributes} {...listeners}>
+    <div
+      ref={setNodeRef}
+      onClick={onClick}
+      style={itemStyle}
+      {...attributes}
+      {...listeners}
+    >
       {children}
     </div>
   )

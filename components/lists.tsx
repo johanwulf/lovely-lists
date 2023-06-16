@@ -1,9 +1,10 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import {
   DndContext,
+  DragEndEvent,
   KeyboardSensor,
   PointerSensor,
   closestCenter,
@@ -27,16 +28,21 @@ export default function Lists() {
   const [list, setList] = useState<ListOverview[]>([])
   const router = useRouter()
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        delay: 80,
+        tolerance: 20,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   )
 
-  function handleDragEnd(event: any) {
+  function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
 
-    if (active.id !== over.id) {
+    if (over && active.id !== over.id) {
       setList((list) => {
         const oldIndex = list.findIndex((item) => item.id === active.id)
         const newIndex = list.findIndex((item) => item.id === over.id)
@@ -46,7 +52,7 @@ export default function Lists() {
   }
   useEffect(() => {
     endpoints.getAllLists().then((res) => {
-      setList(res) // changed here
+      setList(res)
       setLoading(false)
     })
   }, [])
@@ -71,11 +77,12 @@ export default function Lists() {
       >
         {list.map((list: ListOverview) => {
           return (
-            <SortableItem key={list.id} id={list.id}>
-              <Card
-                key={list.id}
-                onClick={() => router.push(`list/${list.id}`)}
-              >
+            <SortableItem
+              key={list.id}
+              id={list.id}
+              onClick={() => router.push(`/list/${list.id}`)}
+            >
+              <Card key={list.id}>
                 <CardHeader>
                   <CardTitle>{list.name}</CardTitle>
                 </CardHeader>
