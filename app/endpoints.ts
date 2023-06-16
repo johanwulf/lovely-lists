@@ -25,10 +25,12 @@ export type List = {
 
 async function api<T>(
   url: string,
-  method: "GET" | "POST" | "DELETE" | "PUT"
+  method: "GET" | "POST" | "DELETE" | "PUT",
+  body?: any
 ): Promise<T> {
   const response = await fetch(url, {
     method,
+    body: body ? JSON.stringify(body) : undefined,
   })
   const result = await response.json()
   return result as T
@@ -47,8 +49,11 @@ export const endpoints = {
   getAllLists: async (): Promise<ListOverview[]> => {
     return api<ListOverview[]>(`/api/lists`, "GET")
   },
-  createItem: async (listId: number, itemName: string): Promise<ListEntry> => {
-    return api<ListEntry>(`/api/item/${listId}/${itemName}`, "POST")
+  createItem: async (
+    listId: number,
+    item: Partial<ListEntry>
+  ): Promise<ListEntry> => {
+    return api<ListEntry>(`/api/item/${listId}`, "POST", item)
   },
   deleteItem: async (itemId: number): Promise<ListEntry> => {
     return api<ListEntry>(`/api/item/${itemId}`, "DELETE")

@@ -61,7 +61,7 @@ export default function List({ params }: { params: { id: number } }) {
 
     const onCreateItem = async (event: any) => {
         event.preventDefault();
-        await endpoints.createItem(params.id, item).then((res) => {
+        await endpoints.createItem(params.id, {name: item, completed: false, listId: params.id }).then((res) => {
             setData({ ...data, items: [...data.items, res] })
         })
         setItem("");
