@@ -9,73 +9,73 @@ const prisma = new PrismaClient();
  * Create new listitem entry and attach it to list
  */
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
-	const listId = Number(params.id);
-	const item: ListEntry = await req.json();
+    const listId = Number(params.id);
+    const item: ListEntry = await req.json();
 
-	const currentMax = await prisma.listEntry.aggregate({
-		_max: {
-			order: true,
-		},
-		where: {
-			listId: listId,
-		},
-	});
+    const currentMax = await prisma.listEntry.aggregate({
+        _max: {
+            order: true,
+        },
+        where: {
+            listId: listId,
+        },
+    });
 
-	const order = currentMax._max.order ? currentMax._max.order + 1 : 1;
+    const order = currentMax._max.order ? currentMax._max.order + 1 : 1;
 
-	await prisma.item.upsert({
-		where: { name: item.name },
-		update: {},
-		create: { name: item.name },
-	});
+    await prisma.item.upsert({
+        where: { name: item.name },
+        update: {},
+        create: { name: item.name },
+    });
 
-	const listEntry = await prisma.listEntry.create({
-		data: {
-			description: item.description,
-			list: {
-				connect: { id: listId },
-			},
-			item: {
-				connect: { name: item.name },
-			},
-			order: order,
-		},
-	});
+    const listEntry = await prisma.listEntry.create({
+        data: {
+            description: item.description,
+            list: {
+                connect: { id: listId },
+            },
+            item: {
+                connect: { name: item.name },
+            },
+            order: order,
+        },
+    });
 
-	const response: ListEntry = {
-		id: listEntry.id,
-		name: listEntry.itemName,
-		listId: listEntry.listId,
-		completed: listEntry.completed,
-		description: item.description,
-		order: order,
-	};
+    const response: ListEntry = {
+        id: listEntry.id,
+        name: listEntry.itemName,
+        listId: listEntry.listId,
+        completed: listEntry.completed,
+        description: item.description,
+        order: order,
+    };
 
-	return NextResponse.json(response);
+    return NextResponse.json(response);
 }
 
 /**
  * Delete item from list
  */
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
-	const itemId = Number(params.id);
+    const itemId = Number(params.id);
 
-	const item = await prisma.listEntry.delete({ where: { id: itemId } });
+    const item = await prisma.listEntry.delete({ where: { id: itemId } });
 
-	return NextResponse.json(item);
+    return NextResponse.json(item);
 }
 
 /**
  * Update status of item
  */
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
-	const itemId = Number(params.id);
-	const item: ListEntry = await req.json();
+    const itemId = Number(params.id);
+    const item: ListEntry = await req.json();
 
-	const res = await prisma.listEntry.update({
-		where: { id: itemId },
-		data: { completed: item.completed },
-	});
+    const res = await prisma.listEntry.update({
+        where: { id: itemId },
+        data: { completed: item.completed },
+    });
 
-	return NextResponse.json(item);
+    return NextResponse.json(item);
 }
