@@ -1,22 +1,40 @@
-# next-template
+# lovely-lists
 
-A Next.js 13 template for building apps with Radix UI and Tailwind CSS.
+Full-stack web application which allows users to create lists, order them by drag and dropping, and adding items to lists.
 
-## Usage
+## Installation
+
+### Repository set up
 
 ```bash
-npx create-next-app -e https://github.com/shadcn/next-template
+git clone https://github.com/johanwulf/lovely-lists
+cd lovely-lists
+npm install
+npm run dev
+```
+
+### Database set up
+
+1. Create a .env file which has the following content
+
+```
+DATABASE_URL="postgresql://<DATBASE_NAME>:<DATABASE_PASSWORD>@localhost:5432/postgres?schema=public"
+```
+
+2. Initialise database schema
+
+```
+npx prisma migrate dev --name init
 ```
 
 ## Features
 
--   Next.js 13 App Directory
--   Radix UI Primitives
--   Tailwind CSS
--   Icons from [Lucide](https://lucide.dev)
--   Dark mode with `next-themes`
--   Tailwind CSS class sorting, merging and linting.
+-   Create, order, and rename lists.
+-   Add, order and rename items to lists.
 
-## License
+## Technologies
 
-Licensed under the [MIT license](https://github.com/shadcn/ui/blob/main/LICENSE.md).
+-   Next.js
+-   Prisma
+-   PostgreSQL
+-   TailwindCSS
