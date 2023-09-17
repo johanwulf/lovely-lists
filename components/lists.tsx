@@ -16,7 +16,7 @@ export default function Lists() {
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: {
-                delay: 80,
+                delay: 100,
                 tolerance: 20,
             },
         }),
@@ -59,8 +59,8 @@ export default function Lists() {
             <SortableContext items={list.map((item) => item.id)} strategy={verticalListSortingStrategy}>
                 {list.map((list: ListOverview) => {
                     return (
-                        <SortableItem key={list.id} id={list.id} onClick={() => router.push(`/list/${list.id}`)}>
-                            <Card key={list.id}>
+                        <SortableItem key={list.id} id={list.id}>
+                            <Card key={list.id} onClick={() => router.push(`/list/${list.id}`)}>
                                 <CardHeader>
                                     <CardTitle>{list.name}</CardTitle>
                                 </CardHeader>
