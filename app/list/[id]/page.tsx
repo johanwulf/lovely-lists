@@ -26,7 +26,7 @@ export default function List({ params }: { params: { id: number } }) {
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: {
-                delay: 80,
+                delay: 100,
                 tolerance: 20,
             },
         }),
