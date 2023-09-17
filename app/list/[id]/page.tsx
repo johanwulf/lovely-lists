@@ -1,19 +1,17 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { PopoverContent } from "@radix-ui/react-popover";
 import { SlidersHorizontal, Trash2, Plus, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverTrigger } from "@/components/ui/popover";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-
-import { endpoints, List, ListEntry } from "@/app/endpoints";
 import { useRouter } from "next/navigation";
 import { DndContext, closestCenter, DragEndEvent, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import SortableItem from "@/components/sortable-item";
+import { endpoints } from "@/app/endpoints";
+import { List } from "@/types/list";
 
 export default function List({ params }: { params: { id: number } }) {
     const [data, setData] = useState<List | null>(null);

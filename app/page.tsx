@@ -1,7 +1,3 @@
-import Link from "next/link";
-
-import { siteConfig } from "@/config/site";
-import { buttonVariants } from "@/components/ui/button";
 import CreateList from "@/components/create-list";
 import Lists from "@/components/lists";
 

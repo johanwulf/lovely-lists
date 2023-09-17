@@ -1,30 +1,4 @@
-type ListResponse = {
-    id: number;
-    name: string;
-};
-export type ListOverview = {
-    name: string;
-    id: number;
-    order: number;
-    totalItems: number;
-    completedItems: number;
-    uncompletedItems: number;
-};
-
-export type ListEntry = {
-    id: number;
-    name: string;
-    listId?: number;
-    description?: string | null;
-    completed: boolean;
-    order: number;
-};
-
-export type List = {
-    name: string;
-    id: number;
-    items: ListEntry[];
-};
+import { ListResponse, ListOverview, List, ListEntry } from "@/types/list";
 
 async function api<T>(url: string, method: "GET" | "POST" | "DELETE" | "PUT", body?: any): Promise<T> {
     const response = await fetch(url, {
